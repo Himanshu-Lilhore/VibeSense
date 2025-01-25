@@ -4,7 +4,7 @@ console.log('YouTube Sentiment Analyzer loaded');
 
 // Function to inject button next to title
 function injectAnalyzeButton() {
-  const titleContainer = document.querySelector('#title h1');
+  const titleContainer = document.querySelector('#above-the-fold #title');
   if (!titleContainer || document.querySelector('#sentiment-analyze-btn')) return;
 
   const button = document.createElement('button');
@@ -12,7 +12,7 @@ function injectAnalyzeButton() {
   button.className = 'sentiment-btn';
   button.innerHTML = 'Analyze Sentiment';
   button.style.cssText = `
-    margin-left: 10px;
+    margin: 8px 0px;
     padding: 8px 16px;
     border-radius: 18px;
     border: none;
@@ -22,11 +22,11 @@ function injectAnalyzeButton() {
     cursor: pointer;
     transition: background 0.2s;
   `;
-  
+
   button.addEventListener('mouseover', () => {
     button.style.background = '#047857';
   });
-  
+
   button.addEventListener('mouseout', () => {
     button.style.background = '#065f46';
   });
@@ -35,13 +35,11 @@ function injectAnalyzeButton() {
   const resultBar = document.createElement('div');
   resultBar.id = 'sentiment-result-bar';
   resultBar.style.cssText = `
-    margin-left: 10px;
-    height: 24px;
-    width: 200px;
+    margin: 8px 0px;
     border-radius: 12px;
-    overflow: hidden;
     display: none;
     position: relative;
+    align-items: center;
   `;
 
   titleContainer.appendChild(button);
@@ -55,29 +53,95 @@ function updateResultBar(sentiment) {
   const resultBar = document.querySelector('#sentiment-result-bar');
   if (!resultBar) return;
 
-  resultBar.style.display = 'flex';
-  resultBar.innerHTML = `
+  const container = document.createElement('div');
+  container.style.cssText = `
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+  `;
+
+  // Sentiment bar
+  const barContainer = document.createElement('div');
+  barContainer.style.cssText = `
+    display: flex;
+    height: 24px;
+    width: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    align-items: center;
+  `;
+
+  barContainer.innerHTML = `
     <div style="
       width: ${sentiment.positive * 100}%;
       height: 100%;
-      background: #059669;
+      background: forestgreen;
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
       font-size: 12px;
-    ">${Math.round(sentiment.positive * 100)}%</div>
+      position: relative;
+    " class="sentiment-section">${Math.round(sentiment.positive * 100)}%</div>
     <div style="
       width: ${sentiment.negative * 100}%;
       height: 100%;
-      background: #dc2626;
+      background: darkred;
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
       font-size: 12px;
-    ">${Math.round(sentiment.negative * 100)}%</div>
+      position: relative;
+    " class="sentiment-section">${Math.round(sentiment.negative * 100)}%</div>
   `;
+
+  container.appendChild(barContainer);
+
+  // Add tablet functionality
+  const tabletContainer = document.createElement('div');
+  tabletContainer.style.cssText = `
+  padding: 8px;
+  z-index: 1000;
+  font-size: 13px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  border: 2px solid darkgrey;
+  border-radius: 5px;
+  background: #ffffff17;
+  align-items: top;
+  `;
+  const tabletContainerTitle = document.createElement('div');
+  tabletContainerTitle.textContent = 'Most discussed:';
+  tabletContainerTitle.style.cssText = `
+    padding: 1px 2px;
+    color: white;
+  `;
+  tabletContainer.appendChild(tabletContainerTitle);
+
+  if (sentiment.topics.length > 0) {
+    sentiment.topics.forEach(topic => {
+      const tablet = document.createElement('div');
+      tablet.textContent = topic;
+      tablet.style.cssText = `
+    background: gray;
+      padding: 0px 8px;
+      border-radius: 5px;
+      color: black;
+      background: darkgrey;
+  `;
+      tabletContainer.appendChild(tablet);
+    });
+
+    container.appendChild(tabletContainer);
+  }
+
+  resultBar.style.display = 'block';
+  resultBar.innerHTML = '';
+  resultBar.appendChild(container);
 }
 
 // Initialize and handle analysis
@@ -87,12 +151,12 @@ async function init() {
 
   // Check if we have cached results
   const videoId = new URLSearchParams(window.location.search).get('v');
-  const cachedResult = await chrome.storage.local.get(videoId);
-  
-  if (cachedResult[videoId]) {
-    button.style.display = 'none';
-    updateResultBar(cachedResult[videoId]);
-  }
+
+  // const cachedResult = await chrome.storage.local.get(videoId);
+  // if (cachedResult[videoId]) {
+  //   button.style.display = 'none';
+  //   updateResultBar(cachedResult[videoId]);
+  // }
 
   button.addEventListener('click', async () => {
     button.disabled = true;
@@ -106,7 +170,7 @@ async function init() {
       });
 
       // Cache the results
-      await chrome.storage.local.set({ [videoId]: sentiment });
+      // await chrome.storage.local.set({ [videoId]: sentiment });
 
       // Update UI
       button.style.display = 'none';

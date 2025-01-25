@@ -17,7 +17,17 @@ export async function analyzeSentiment(comments) {
       body: JSON.stringify({
         contents: [{
           parts: [{
-            text: `Analyze the sentiment of these YouTube comments. Return only a JSON object with 'positive' and 'negative' ratios that sum to 1.0. For example: {"positive": 0.7, "negative": 0.3}. Here are the comments:\n\n${commentsText}`
+            text: `Analyze these YouTube comments and return a JSON object with:
+            1. Sentiment ratios ('positive' and 'negative' that sum to 1.0)
+            2. Top 4 most mentioned topics/themes ('topics' array)
+            
+            Format: {
+              "positive": 0.7,
+              "negative": 0.3,
+              "topics": ["topic1", "topic2", "topic3", "topic4"]
+            }
+            
+            Comments:\n\n${commentsText}`
           }]
         }],
         generationConfig: {
