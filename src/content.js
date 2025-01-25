@@ -2,12 +2,15 @@
 // You can use it to interact with the page if needed
 console.log('YouTube Sentiment Analyzer loaded');
 
+
+let button = null, resultsContainer = null;
+
 // Function to inject button next to title
 function injectAnalyzeButton() {
   const titleContainer = document.querySelector('#above-the-fold #title');
   if (!titleContainer || document.querySelector('#sentiment-analyze-btn')) return;
 
-  const button = document.createElement('button');
+  button = document.createElement('button');
   button.id = 'sentiment-analyze-btn';
   button.className = 'sentiment-btn';
   button.innerHTML = 'Analyze Sentiment';
@@ -32,9 +35,9 @@ function injectAnalyzeButton() {
   });
 
   // Add result bar container
-  const resultBar = document.createElement('div');
-  resultBar.id = 'sentiment-result-bar';
-  resultBar.style.cssText = `
+  resultsContainer = document.createElement('div');
+  resultsContainer.id = 'sentiment-result-bar';
+  resultsContainer.style.cssText = `
     margin: 8px 0px;
     border-radius: 12px;
     display: none;
@@ -43,15 +46,15 @@ function injectAnalyzeButton() {
   `;
 
   titleContainer.appendChild(button);
-  titleContainer.appendChild(resultBar);
+  titleContainer.appendChild(resultsContainer);
 
-  return { button, resultBar };
+  return { button, resultsContainer };
 }
 
 // Function to update result bar
-function updateResultBar(sentiment) {
-  const resultBar = document.querySelector('#sentiment-result-bar');
-  if (!resultBar) return;
+function updateResultsContainer(sentiment) {
+  const resultsContainer = document.querySelector('#sentiment-result-bar');
+  if (!resultsContainer) return;
 
   const container = document.createElement('div');
   container.style.cssText = `
@@ -122,7 +125,7 @@ function updateResultBar(sentiment) {
   `;
   tabletContainer.appendChild(tabletContainerTitle);
 
-  if (sentiment.topics.length > 0) {
+  if (sentiment.topics && sentiment.topics?.length > 0) {
     sentiment.topics.forEach(topic => {
       const tablet = document.createElement('div');
       tablet.textContent = topic;
@@ -139,15 +142,19 @@ function updateResultBar(sentiment) {
     container.appendChild(tabletContainer);
   }
 
-  resultBar.style.display = 'block';
-  resultBar.innerHTML = '';
-  resultBar.appendChild(container);
+  resultsContainer.style.display = 'block';
+  resultsContainer.innerHTML = '';
+  resultsContainer.appendChild(container);
 }
 
 // Initialize and handle analysis
 async function init() {
-  const { button, resultBar } = injectAnalyzeButton() || {};
-  if (!button) return;
+  if(button) button.remove();
+  if(resultsContainer) resultsContainer.remove();
+
+  const res = injectAnalyzeButton() || {};
+  if(res.button)button = res.button; else return
+  if(res.resultsContainer) resultsContainer = res.resultsContainer;
 
   // Check if we have cached results
   const videoId = new URLSearchParams(window.location.search).get('v');
@@ -155,7 +162,7 @@ async function init() {
   // const cachedResult = await chrome.storage.local.get(videoId);
   // if (cachedResult[videoId]) {
   //   button.style.display = 'none';
-  //   updateResultBar(cachedResult[videoId]);
+  //   updateResultsContainer(cachedResult[videoId]);
   // }
 
   button.addEventListener('click', async () => {
@@ -174,7 +181,7 @@ async function init() {
 
       // Update UI
       button.style.display = 'none';
-      updateResultBar(sentiment);
+      updateResultsContainer(sentiment);
     } catch (error) {
       button.innerHTML = 'Error: Try Again';
       console.error('Analysis failed:', error);
