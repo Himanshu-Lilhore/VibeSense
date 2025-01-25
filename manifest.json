@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Sentiment Analyzer",
+  "version": "1.0",
+  "description": "Analyzes sentiment of YouTube video comments using LLM",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://*.youtube.com/*"
+  ],
+  "action": {
+    "default_popup": "index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.youtube.com/*"],
+      "js": ["assets/content.js"]
+    }
+  ]
+} 
