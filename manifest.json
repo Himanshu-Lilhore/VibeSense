@@ -12,7 +12,8 @@
     "https://*.youtube.com/*"
   ],
   "action": {
-    "default_popup": "index.html"
+    "default_popup": "index.html",
+    "default_icon": "icons/128.png"
   },
   "content_scripts": [
     {

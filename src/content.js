@@ -13,7 +13,7 @@ function injectAnalyzeButton() {
   button = document.createElement('button');
   button.id = 'sentiment-analyze-btn';
   button.className = 'sentiment-btn';
-  button.innerHTML = 'Analyze Sentiment';
+  button.innerHTML = 'Analyze Sentiment ✨';
   button.style.cssText = `
     margin: 8px 0px;
     padding: 8px 16px;
@@ -22,6 +22,7 @@ function injectAnalyzeButton() {
     background: #065f46;
     color: white;
     font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
     transition: background 0.2s;
   `;
@@ -177,7 +178,7 @@ async function init() {
       });
 
       // Cache the results
-      // await chrome.storage.local.set({ [videoId]: sentiment });
+      await chrome.storage.local.set({ [videoId]: sentiment });
 
       // Update UI
       button.style.display = 'none';
