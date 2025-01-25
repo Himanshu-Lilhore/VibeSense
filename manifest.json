@@ -5,7 +5,8 @@
   "description": "Analyzes sentiment of YouTube video comments using LLM",
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+    "tabs"
   ],
   "host_permissions": [
     "https://*.youtube.com/*"
@@ -18,5 +19,9 @@
       "matches": ["https://*.youtube.com/*"],
       "js": ["assets/content.js"]
     }
-  ]
+  ],
+  "background": {
+    "service_worker": "assets/background.js",
+    "type": "module"
+  }
 } 
