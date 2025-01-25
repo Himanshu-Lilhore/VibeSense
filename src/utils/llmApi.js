@@ -45,5 +45,3 @@ export async function analyzeSentiment(comments) {
     throw new Error('Error analyzing sentiment: ' + error.message);
   }
 }
-
-// curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyA364F3qTE_PZwa421R1H1yFoZ2_H5E_CQ" -H "Content-Type: application/json" -X POST -d "{ \"contents\": [{ \"parts\":[{\"text\": \"Explain how AI works\"}] }] }"
