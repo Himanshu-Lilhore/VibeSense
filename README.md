@@ -66,5 +66,13 @@ A browser extension built with **React** and tailwind that analyzes the sentimen
 
 ---
 
+## 🖼️Visuals
+![image](https://github.com/user-attachments/assets/99bd0c88-042d-46ca-b66d-d1b80cfa4fc8)  
+
+
+![Screenshot 2025-01-25 155851](https://github.com/user-attachments/assets/cb1dd585-2260-42ae-8c2f-21b8608b4e26)
+
+---
+
 ## 📃 License
 This project is licensed under the [MIT License](LICENSE).
