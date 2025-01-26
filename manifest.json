@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Sentiment Analyzer",
+  "name": "VibeSense",
   "version": "1.0",
-  "description": "Analyzes sentiment of YouTube video comments using LLM",
+  "description": "Analyzes sentiment of YouTube video comments section using LLM",
   "permissions": [
     "activeTab",
     "storage",
