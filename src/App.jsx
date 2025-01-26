@@ -5,6 +5,7 @@ function App() {
   const [sentiment, setSentiment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [thumbnailUrl, setThumbnailUrl] = useState(null);
+  const [thumbnailLoading, setThumbnailLoading] = useState(true);
 
   useEffect(() => {
     async function getCurrentVideoSentiment() {
@@ -27,19 +28,25 @@ function App() {
     }
 
     async function getThumbnail() {
-      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      const videoId = new URLSearchParams(new URL(tab.url).search).get('v');
-      if (videoId) {
-        const response = await fetch(
-          `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${YOUTUBE_API_KEY}&part=snippet,contentDetails`
-        );
-        if (!response.ok) {
-          throw new Error('Failed to fetch thumbnail');
+      try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        const videoId = new URLSearchParams(new URL(tab.url).search).get('v');
+        if (videoId) {
+          const response = await fetch(
+            `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${YOUTUBE_API_KEY}&part=snippet,contentDetails`
+          );
+          if (!response.ok) {
+            throw new Error('Failed to fetch thumbnail');
+          }
+          const responseObj = await response.json();
+          const thumbnailUrl = responseObj.items[0].snippet.thumbnails.high.url ||
+            responseObj.items[0].snippet.thumbnails.default.url;
+          setThumbnailUrl(thumbnailUrl);
         }
-        const responseObj = await response.json();
-        const thumbnailUrl = responseObj.items[0].snippet.thumbnails.high.url ||
-          responseObj.items[0].snippet.thumbnails.default.url;
-        setThumbnailUrl(thumbnailUrl);
+      } catch (error) {
+        console.error('Error fetching thumbnail:', error);
+      } finally {
+        setThumbnailLoading(false);
       }
     }
 
@@ -54,9 +61,12 @@ function App() {
   if (!sentiment) {
     return (
       <div className="w-64 p-4 flex flex-col items-center justify-center gap-3 relative text-slate-200 font-sans">
+        <Title />
+
         <div className='text-lg font-bold'>
           Click the Analyze button next to the video title
         </div>
+
         <BackgroundSvg />
       </div>
     );
@@ -65,13 +75,19 @@ function App() {
   return (
     <div className="w-64 p-4 flex flex-col items-center justify-center gap-3 relative text-slate-200 font-sans">
 
-      <div className='text-3xl font-bold flex flex-row'>
-        <div className='text-blue-500'>Vibe</div>
-        <div className='text-orange-500'>Sense</div>
-      </div>
+      <Title />
 
-      <div className='w-full rounded-md overflow-hidden border-2 border-slate-600 shadow-md shadow-slate-900'>
-        <img className='w-full object-cover' src={thumbnailUrl} alt={`thumbnail`} />
+      <div className="relative w-full h-32 rounded-md overflow-hidden border-2 border-slate-600 shadow-md shadow-slate-900">
+        <img
+          className={`absolute z-10 top-0 left-0 w-full h-32 object-cover transition-opacity duration-[2s] 
+            ${thumbnailLoading ? 'opacity-100' : 'opacity-0'}`}
+          src='/imageSkeleton.png'
+        />
+        <img
+          className='w-full h-32 object-cover'
+          src={thumbnailUrl}
+          alt="thumbnail"
+        />
       </div>
 
       <div className="flex h-4 rounded-full overflow-hidden w-full text-black text-xs font-semibold">
@@ -107,6 +123,15 @@ function App() {
 
     </div>
   );
+}
+
+function Title() {
+  return (
+    <div className='text-3xl font-bold flex flex-row'>
+      <div className='text-blue-500'>Vibe</div>
+      <div className='text-orange-500'>Sense</div>
+    </div>
+  )
 }
 
 function BackgroundSvg() {

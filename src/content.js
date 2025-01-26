@@ -160,32 +160,41 @@ async function init() {
   // Check if we have cached results
   const videoId = new URLSearchParams(window.location.search).get('v');
 
-  // const cachedResult = await chrome.storage.local.get(videoId);
-  // if (cachedResult[videoId]) {
-  //   button.style.display = 'none';
-  //   updateResultsContainer(cachedResult[videoId]);
-  // }
+  const cachedResult = await chrome.storage.local.get(videoId);
+  if (cachedResult[videoId]) {
+    button.style.display = 'none';
+    updateResultsContainer(cachedResult[videoId]);
+    return
+  }
 
   button.addEventListener('click', async () => {
     button.disabled = true;
     button.innerHTML = 'Analyzing...';
 
     try {
+      // Check if chrome.runtime is available
+      if (!chrome?.runtime?.sendMessage) {
+        throw new Error('Chrome extension API not available');
+      }
+
       // Send message to background script to handle API calls
       const sentiment = await chrome.runtime.sendMessage({
         type: 'ANALYZE_SENTIMENT',
         videoId
       });
 
-      // Cache the results
-      await chrome.storage.local.set({ [videoId]: sentiment });
+      // Check if chrome.storage is available
+      if (chrome?.storage?.local) {
+        // Cache the results
+        await chrome.storage.local.set({ [videoId]: sentiment });
+      }
 
       // Update UI
       button.style.display = 'none';
       updateResultsContainer(sentiment);
     } catch (error) {
-      button.innerHTML = 'Error: Try Again';
       console.error('Analysis failed:', error);
+      button.innerHTML = 'Error: ' + (error.message || 'Try Again');
     } finally {
       button.disabled = false;
     }
@@ -195,11 +204,8 @@ async function init() {
 // Run on page load and URL changes
 init();
 const observer = new MutationObserver(() => {
-  if (window.location.href !== lastUrl) {
-    lastUrl = window.location.href;
-    init();
-  }
+  init();
+
 });
 
-let lastUrl = window.location.href;
 observer.observe(document.querySelector('head > title'), { subtree: true, childList: true }); 
