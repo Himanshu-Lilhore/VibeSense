@@ -1,8 +1,7 @@
-# 🧠 YouTube Comment Sentiment Analyzer 🚀
+# ![image](https://github.com/user-attachments/assets/832c715c-69a3-4093-a230-ed55cf2a8858) 
 
-A browser extension built with **React** and tailwind that analyzes the sentiment of YouTube video comments using an **Gemini API**.
+A browser extension built with **React** and tailwind that analyzes the sentiment of YouTube video comments using a Large Language Model.
 
----
 
 ## 🛠️ Tech Stack
 - **React**
@@ -11,7 +10,6 @@ A browser extension built with **React** and tailwind that analyzes the sentimen
 - **JavaScript**
 - **HTML & CSS**
 
----
 
 ## 🚀 How to setup locally
 1. Clone this repository:
@@ -50,29 +48,25 @@ A browser extension built with **React** and tailwind that analyzes the sentimen
    - Enable "Developer Mode."
    - Click "Load unpacked" and select the `build` folder.
 
----
 
 ## 🧪 How to use
 1. Go to any YouTube video.
 2. Click on the extension icon in your browser.
 3. Watch the magic as the comments are analyzed and the sentiment is displayed! ✨
 
----
 
 ## 📚 How It Works
 1. The extension fetches the **top 100 comments** of a video using the **YouTube API**.
 2. These comments are sent to an **LLM API** for sentiment analysis.
 3. The result is given as a ratio (Positive : Negative) and displayed in the UI.
 
----
 
 ## 🖼️Visuals
-![image](https://github.com/user-attachments/assets/99bd0c88-042d-46ca-b66d-d1b80cfa4fc8)  
+![image](https://github.com/user-attachments/assets/18f37bac-3f38-437e-8620-467ab5d7e862)
 
 
 ![Screenshot 2025-01-25 155851](https://github.com/user-attachments/assets/cb1dd585-2260-42ae-8c2f-21b8608b4e26)
 
----
 
 ## 📃 License
 This project is licensed under the [MIT License](LICENSE).
