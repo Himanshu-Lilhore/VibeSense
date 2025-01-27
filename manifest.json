@@ -1,12 +1,13 @@
 {
   "manifest_version": 3,
   "name": "VibeSense",
-  "version": "1.0",
+  "version": "1.2",
   "description": "Analyzes sentiment of YouTube video comments section using LLM",
   "permissions": [
     "activeTab",
     "storage",
-    "tabs"
+    "tabs",
+    "unlimitedStorage"
   ],
   "host_permissions": [
     "https://*.youtube.com/*"
