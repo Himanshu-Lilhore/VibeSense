@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 const YOUTUBE_API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
 
-function App() {
+export default function App() {
   const [sentiment, setSentiment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [thumbnailUrl, setThumbnailUrl] = useState(null);
@@ -17,7 +17,9 @@ function App() {
         if (videoId) {
           // Check cached results
           const result = await chrome.storage.local.get(videoId);
-          if (result[videoId]) {
+          if (result[videoId].error) {
+            setSentiment('error');
+          } else {
             setSentiment(result[videoId]);
           }
         }
@@ -65,8 +67,17 @@ function App() {
       <div className="w-64 p-4 flex flex-col items-center justify-center gap-3 relative text-slate-200 font-sans">
         <Title />
 
-        <div className='text-lg font-bold'>
-          Click the Analyze button next to the video title
+        <div className='text-base flex flex-row gap-1.5 flex-wrap items-center pt-4'>
+          {'Click the Analyze button next to a YouTube video title...'
+            .split(' ')
+            .map((word, idx) => {
+              if (word === 'Analyze') {
+                return <div key={idx} className='bg-green-700 text-white px-2 rounded-full'>{word}✨</div>
+              } else {
+                return <div key={idx} className='font-semibold text-slate-300'>{word}</div>
+              }
+            })}
+          <GithubIcon />
         </div>
 
         <BackgroundSvg />
@@ -101,36 +112,16 @@ function App() {
         />
       </div>
 
-      {/* Sentiment Bar  */}
-      <div className="flex h-4 rounded-full overflow-hidden w-full text-black text-xs font-semibold">
-        <div
-          className="bg-green-600 flex items-center justify-center"
-          style={{ width: `${sentiment.positive * 100}%` }}
-        >
-          {Math.round(sentiment.positive * 100)}%
+      {sentiment === 'error' ?
+        <div className='text-lg text-slate-200 font-semibold flex flex-row gap-1 items-center'>No comments 🙊
+          <div className='size-5 bg-black/15 backdrop-blur-md rounded-md flex items-center justify-center'><GithubIcon /></div>
         </div>
-        <div
-          className="bg-red-600 flex items-center justify-center"
-          style={{ width: `${sentiment.negative * 100}%` }}
-        >
-          {Math.round(sentiment.negative * 100)}%
-        </div>
-      </div>
-
-      {/* Topics  */}
-      <div className="flex flex-col gap-1">
-        <div className="text-xs font-semibold w-full relative">Most discussed:
-          <div className='absolute right-2 top-0 z-50 size-5 bg-black/15 backdrop-blur-md rounded-md flex items-center justify-center'>
-            <GithubIcon />
-          </div>
-        </div>
-        <div className="flex flex-row gap-1 flex-wrap">
-          {sentiment.topics?.map((topic, index) => (
-            <div key={index} className="text-sm text-white px-2 py-1 bg-gray-800/60 backdrop-blur-sm rounded-md">{topic}</div>
-          )) || <div className="text-sm text-white">No topics found</div>}
-        </div>
-      </div>
-
+        :
+        <>
+          <SentimentBar sentiment={sentiment} />
+          <Topics sentiment={sentiment} />
+        </>
+      }
 
       <BackgroundSvg />
 
@@ -146,6 +137,41 @@ function Title() {
     </div>
   )
 }
+function SentimentBar({ sentiment }) {
+  return (
+    <div className="flex h-4 rounded-full overflow-hidden w-full text-black text-xs font-semibold">
+      <div
+        className="bg-green-600 flex items-center justify-center"
+        style={{ width: `${sentiment.positive * 100}%` }}
+      >
+        {Math.round(sentiment.positive * 100)}%
+      </div>
+      <div
+        className="bg-red-600 flex items-center justify-center"
+        style={{ width: `${sentiment.negative * 100}%` }}
+      >
+        {Math.round(sentiment.negative * 100)}%
+      </div>
+    </div>
+  )
+}
+function Topics({ sentiment }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="text-xs font-semibold w-full relative">Most discussed:
+        <div className='absolute right-2 top-0 z-50 size-5 bg-black/15 backdrop-blur-md rounded-md flex items-center justify-center'>
+          <GithubIcon />
+        </div>
+      </div>
+      <div className="flex flex-row gap-1 flex-wrap">
+        {sentiment.topics?.map((topic, index) => (
+          <div key={index} className="text-sm text-white px-2 py-1 bg-gray-800/60 backdrop-blur-sm rounded-md">{topic}</div>
+        )) || <div className="text-sm text-white">No topics found</div>}
+      </div>
+    </div>
+  )
+}
+
 
 function BackgroundSvg() {
   return (
@@ -176,6 +202,4 @@ function GithubIcon() {
       </svg>
     </a>
   )
-}
-
-export default App; 
+} 

@@ -150,21 +150,27 @@ function updateResultsContainer(sentiment) {
 
 // Initialize and handle analysis
 async function init() {
-  if(button) button.remove();
-  if(resultsContainer) resultsContainer.remove();
+  if (button) button.remove();
+  if (resultsContainer) resultsContainer.remove();
 
   const res = injectAnalyzeButton() || {};
-  if(res.button)button = res.button; else return
-  if(res.resultsContainer) resultsContainer = res.resultsContainer;
+  if (res.button) button = res.button; else return
+  if (res.resultsContainer) resultsContainer = res.resultsContainer;
 
   // Check if we have cached results
   const videoId = new URLSearchParams(window.location.search).get('v');
 
   const cachedResult = await chrome.storage.local.get(videoId);
   if (cachedResult[videoId]) {
+    if ('error' in cachedResult[videoId]) {
+      button.style.cursor = 'not-allowed';
+      button.innerHTML = 'No comments 🙊';
+      resultsContainer.style.display = 'none';
+      button.style.display = 'block';
+      return
+    }
     button.style.display = 'none';
     updateResultsContainer(cachedResult[videoId]);
-    return
   }
 
   button.addEventListener('click', async () => {
@@ -191,7 +197,15 @@ async function init() {
 
       // Update UI
       button.style.display = 'none';
-      updateResultsContainer(sentiment);
+
+      if ('error' in sentiment) {
+        button.style.cursor = 'not-allowed';
+        button.innerHTML = 'No comments 🙊';
+        resultsContainer.style.display = 'none';
+        button.style.display = 'block';
+      } else {
+        updateResultsContainer(sentiment);
+      }
     } catch (error) {
       console.error('Analysis failed:', error);
       button.innerHTML = 'Error: ' + (error.message || 'Try Again');
@@ -205,7 +219,6 @@ async function init() {
 init();
 const observer = new MutationObserver(() => {
   init();
-
 });
 
 observer.observe(document.querySelector('head > title'), { subtree: true, childList: true }); 
