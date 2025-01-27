@@ -6,6 +6,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [thumbnailUrl, setThumbnailUrl] = useState(null);
   const [thumbnailLoading, setThumbnailLoading] = useState(true);
+  const [thumbnailLoaded, setThumbnailLoaded] = useState(false);
 
   useEffect(() => {
     async function getCurrentVideoSentiment() {
@@ -47,6 +48,7 @@ function App() {
         console.error('Error fetching thumbnail:', error);
       } finally {
         setThumbnailLoading(false);
+        setThumbnailLoaded(true);
       }
     }
 
@@ -77,19 +79,29 @@ function App() {
 
       <Title />
 
+      {/* Thumbnail  */}
       <div className="relative w-full h-32 rounded-md overflow-hidden border-2 border-slate-600 shadow-md shadow-slate-900">
-        <img
-          className={`absolute z-10 top-0 left-0 w-full h-32 object-cover transition-opacity duration-[2s] 
+        {/* skeleton  */}
+        {thumbnailLoaded ?
+          <img
+            className={`absolute z-10 top-0 left-0 w-full h-32 object-cover transition-opacity delay-500 duration-[1.3s]
             ${thumbnailLoading ? 'opacity-100' : 'opacity-0'}`}
-          src='/imageSkeleton.png'
-        />
+            src='/imageAnimation.gif'
+          /> :
+          <img
+            className='absolute top-0 left-0 w-full h-32 object-cover'
+            src='/imageStillSkeleton.png'
+          />
+        }
+        {/* actual thumbnail  */}
         <img
-          className='w-full h-32 object-cover'
+          className='w-full h-32 object-cover z-10'
           src={thumbnailUrl}
           alt="thumbnail"
         />
       </div>
 
+      {/* Sentiment Bar  */}
       <div className="flex h-4 rounded-full overflow-hidden w-full text-black text-xs font-semibold">
         <div
           className="bg-green-600 flex items-center justify-center"
@@ -105,6 +117,7 @@ function App() {
         </div>
       </div>
 
+      {/* Topics  */}
       <div className="flex flex-col gap-1">
         <div className="text-xs font-semibold w-full relative">Most discussed:
           <div className='absolute right-2 top-0 z-50 size-5 bg-black/15 backdrop-blur-md rounded-md flex items-center justify-center'>
