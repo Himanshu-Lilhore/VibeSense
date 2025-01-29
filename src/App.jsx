@@ -7,13 +7,27 @@ export default function App() {
   const [thumbnailUrl, setThumbnailUrl] = useState(null);
   const [thumbnailLoading, setThumbnailLoading] = useState(true);
   const [thumbnailLoaded, setThumbnailLoaded] = useState(false);
+  const [isShorts, setIsShorts] = useState(false);
+
+  function getVideoId(url) {
+    const urlObj = new URL(url);
+    const isShorts = urlObj.pathname.includes('/shorts/');
+    
+    if (isShorts) {
+      // For Shorts URLs: /shorts/CHbbpMvW01s
+      return urlObj.pathname.split('/shorts/')[1];
+    } else {
+      // For regular videos: ?v=CHbbpMvW01s
+      return new URLSearchParams(urlObj.search).get('v');
+    }
+  }
 
   useEffect(() => {
     async function getCurrentVideoSentiment() {
       try {
-        // Get current tab's YouTube video ID
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        const videoId = new URLSearchParams(new URL(tab.url).search).get('v');
+        setIsShorts(tab.url.includes('/shorts/'));
+        const videoId = getVideoId(tab.url);
         if (videoId) {
           // Check cached results
           const result = await chrome.storage.local.get(videoId);
@@ -33,7 +47,7 @@ export default function App() {
     async function getThumbnail() {
       try {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        const videoId = new URLSearchParams(new URL(tab.url).search).get('v');
+        const videoId = getVideoId(tab.url);
         if (videoId) {
           const response = await fetch(
             `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${YOUTUBE_API_KEY}&part=snippet,contentDetails`
@@ -90,23 +104,23 @@ export default function App() {
 
       <Title />
 
-      {/* Thumbnail  */}
-      <div className="relative w-full h-32 rounded-md overflow-hidden border-2 border-slate-600 shadow-md shadow-slate-900">
-        {/* skeleton  */}
+      {/* Thumbnail with dynamic height */}
+      <div className={`relative ${isShorts ? 'w-1/2 h-48' : 'w-full h-32'} rounded-md overflow-hidden border-2 border-slate-600 shadow-md shadow-slate-900`}>
+        {/* skeleton */}
         {thumbnailLoaded ?
           <img
-            className={`absolute z-10 top-0 left-0 w-full h-32 object-cover transition-opacity delay-500 duration-[1.3s]
+            className={`absolute z-10 top-0 left-0 h-full w-full object-cover transition-opacity delay-500 duration-[1.3s]
             ${thumbnailLoading ? 'opacity-100' : 'opacity-0'}`}
             src='/imageAnimation.gif'
           /> :
           <img
-            className='absolute top-0 left-0 w-full h-32 object-cover'
+            className={`absolute top-0 left-0 h-full w-full object-cover`}
             src='/imageStillSkeleton.png'
           />
         }
-        {/* actual thumbnail  */}
+        {/* actual thumbnail */}
         <img
-          className='w-full h-32 object-cover z-10'
+          className={`h-full w-full object-cover z-10`}
           src={thumbnailUrl}
           alt="thumbnail"
         />
