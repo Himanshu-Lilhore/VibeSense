@@ -1,4 +1,5 @@
 const YOUTUBE_API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
+const commentsToFetch = 20; // most popular comments
 
 export async function fetchComments(videoId) {
   try {
@@ -7,7 +8,7 @@ export async function fetchComments(videoId) {
     }
 
     const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoId}&maxResults=100&order=relevance&key=${YOUTUBE_API_KEY}`
+      `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoId}&maxResults=${commentsToFetch}&order=relevance&key=${YOUTUBE_API_KEY}`
     );
 
     if (!response.ok) {
