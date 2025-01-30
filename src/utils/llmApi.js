@@ -1,5 +1,8 @@
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+const model =
+  'gemini-1.5-flash';
+  // 'gemini-2.0-flash';
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
 export async function analyzeSentiment(comments) {
   try {
@@ -45,7 +48,7 @@ export async function analyzeSentiment(comments) {
     const data = await response.json();
     const textResponse = data.candidates[0].content.parts[0].text;
     const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
-    
+
     if (!jsonMatch) {
       throw new Error('Invalid response format from Gemini');
     }
