@@ -1,6 +1,7 @@
 # ![image](https://github.com/user-attachments/assets/832c715c-69a3-4093-a230-ed55cf2a8858) 
 
-A browser extension built with **React** and tailwind that analyzes the sentiment of YouTube video comments using a Large Language Model.
+A browser extension built with **React** and tailwind that analyzes the sentiment of YouTube video comments using a Large Language Model.  
+[Live on Microsoft Addons store](https://microsoftedge.microsoft.com/addons/detail/vibesense/leciifcgniklalladaefihjnfpjbmmdf)
 
 
 ## 🛠️ Tech Stack
